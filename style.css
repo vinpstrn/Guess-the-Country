@@ -1,0 +1,142 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+html {
+  font-size: 62.5%;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #fff;
+  font-family: "Playwrite DE Grund", cursive;
+  color: #555;
+}
+
+.container {
+  width: 100%;
+  max-width: 50rem;
+  margin: 0 auto;
+  margin-top: 1rem;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  text-align: center;
+}
+
+.heading {
+  font-size: 1.75rem;
+}
+
+.country {
+}
+
+.country-img {
+  border-radius: 1.5rem;
+  display: block;
+  width: 100%;
+}
+
+.btn-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.btn {
+  font-family: "Playwrite DE Grund", cursive;
+  font-size: 1.5rem;
+  border: none;
+  background-color: transparent;
+  color: green;
+  padding: 1.5rem;
+  border: 1px solid green;
+  border-radius: 3rem;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+
+.btn-country {
+  color: green;
+  border: 1px solid green;
+}
+
+.btn-country:hover {
+  background-color: green;
+  color: #fff;
+}
+
+.btn-next {
+  background-color: green;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.correct {
+  background-color: green;
+  color: #fff;
+}
+
+.wrong {
+  background-color: red;
+  color: #fff;
+}
+
+.wrong:hover {
+  background-color: red !important;
+  border: 1px solid red;
+  color: #fff;
+}
+
+.disabled {
+  cursor: not-allowed;
+}
+
+.arkyn-img {
+  position: relative;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.arkyn-img-wrong {
+  animation: move .1s infinite;
+}
+
+.arkyn-img-correct {
+  animation: move2 .5s infinite alternate;
+}
+
+@keyframes move {
+  0% {
+    top: 1rem;
+  }
+  100% {
+    top: 1.5rem; /* Or any other value */
+  }
+}
+
+
+@keyframes move2 {
+  0% {
+    transform: rotate(10deg);
+  }
+
+  0% {
+    transform: rotate(-10deg);
+  }
+
+  0% {
+    transform: rotate(10deg);
+  }
+
+  100% {
+    transform: rotate(-10deg);
+  }
+}
