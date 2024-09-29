@@ -1,151 +1,23 @@
 'use strict';
 
-// function getCountryAndData() {
-
-//   // AJAX call country 1
-//   const request = new XMLHttpRequest();
-//   request.open('GET', `https://restcountries.com/v3.1/all`);
-//   request.send();
-
-//   request.addEventListener('load', function() {
-//     // console.log(JSON.parse(this.responseText));
-
-//     const data = JSON.parse(this.responseText);
-//     randomCountry = data[Math.trunc(Math.random() * data.length)];
-//     console.log(randomCountry);
-//     // Render country 1
-//     renderCountry(randomCountry);
-  
-//   });
-// }
-
-// // getCountryAndData('portugal');
-// getCountryAndData();
-
-
-
-// FETCH
-
-
-// const btn = document.querySelector('.btn-country');
-// const countriesContainer = document.querySelector('.countries'); 
-
-// const renderCountry = function(data, className = '') {
-
-//   const currencyKey = Object.keys(data.currencies)[0];
-//   const languageKey = Object.keys(data.languages)[0];
-
-//   const html = `
-//   <article class="country ${className}">
-//     <img class="country__img" src="${data.flags.svg}" />
-//     <div class="country__data">
-//       <h3 class="country__name">${data.name.common}</h3>
-//       <h4 class="country__region">${data.region}</h4>
-//       <p class="country__row"><span>👫</span>${(+data.population / 1000000).toFixed(1)}</p>
-//       <p class="country__row"><span>🗣️</span>${data.languages[languageKey]}</p>
-//       <p class="country__row"><span>💰</span>${data.currencies[currencyKey].name}</p>
-//     </div>
-//   </article>
-//   `;
-
-//   countriesContainer.insertAdjacentHTML('beforeend', html);
-//   countriesContainer.style.opacity = 1;
-// }
-
-// const renderError = function(msg) {
-//   countriesContainer.insertAdjacentText('beforeend', msg);
-//   // countriesContainer.style.opacity = 1;
-// }
-
-// const getJSON = function(url, errorMessage = 'Something went wrong') {
-//   return fetch(url).then(response => {
-//     if(!response.ok) {
-//       throw new Error(`${errorMessage} (${response.status})`);
-//     }
-
-//     return response.json();
-//   });
-// }
-
-// const getCountryAndData = function(country) {
-//   getJSON(`https://restcountries.com/v3.1/name/${country}`, `Country not found`)
-//   .then(data => {
-//     renderCountry(data[0]);
-//     let neighbour;
-
-//     if(data[0].hasOwnProperty('borders')) {
-//       neighbour = data[0].borders[0];
-//     } else {
-//       throw new Error('No neighbour found!')
-//     }
-
-//     return getJSON(`https://restcountries.com/v3.1/alpha/${neighbour}`, `Country not found`);
-//   })
-//   .then(data => renderCountry(data[0], 'neighbour'))
-//   .catch(err => {
-//     renderError(`Something went wrong 💥💥💥 ${err.message} Try again!`);
-//   })
-//   .finally(() => {
-//     countriesContainer.style.opacity = 1;
-//   });
-// };
-
-// btn.addEventListener('click', function() {
-//   getCountryAndData('usa');
-// });
-
-// const btn = document.querySelector('.btn-country');
-// const countriesContainer = document.querySelector('.countries'); 
-
-// const whereAmI = function(lat, lng) {
-//   fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
-//   .then(res => {
-    
-//     if(!res.ok) throw new Error(`Problem with Geocoding ${res.status}`);
-
-//     return res.json();
-//   })
-//   .then(data => {
-//     console.log(data);
-//     console.log(`You are in ${data.city}, ${data.country}`);
-
-//     return fetch(`https://restcountries.com/v3.1/name/${data.country}`);
-//   })
-//   .then(res => {
-
-//     if(!res.ok) throw new Error(`Country not found (${res.status})`);
-
-//     return res.json();
-
-//   })
-//   .then(data => renderCountry(data[0]))
-//   .catch(err => console.log(`Error ${err.message}`));
-// }
-
-// whereAmI(52.508, 13.381);
-
-
-// const lotteryPromise = new Promise(function(resolve, reject) {
-
-//   console.log(`Lottery draw is happening...`);
-//   setTimeout(function() {
-//     if(Math.random() >= 0.5) {
-//       resolve(`You win 💰`);
-//     } else {
-//       reject(new Error('You lost your money! 💩'));
-//     }
-//   }, 2000)
-
-// });
-
-// lotteryPromise.then(res => console.log(res)).catch(err => console.error(err.message));
-
 const btns = document.querySelectorAll('.btn-country');
 const btnContainer = document.querySelector('.btn-container');
 const btnNext = document.querySelector('.btn-next');
 const countriesContainer = document.querySelector('.country');
+const countdownEl = document.querySelector('.countdown');
+const questionEl = document.querySelector('.question');
+const scoreEl = document.querySelector('.score');
+const scorecardEl = document.querySelector('.scorecard');
+const finalScoreEl = document.querySelector('.final-score');
 let data;
 let correctCountry;
+let countdownIntervalID;
+let countdownSec = 10;
+let questionCounter = 1;
+let scoreNo = 0;
+let ScoreItems = 15;
+let answerSelected = false;
+let newGame = false;
 
 const renderCountry = function(data) {
   countriesContainer.innerHTML = `<img class="country-img" src="${data.flags.svg}" />`;
@@ -183,32 +55,48 @@ function shuffleArray(arr) {
 }
 
 const nextQuestion = function() {
-  correctCountry = Math.trunc(Math.random() * data.length - 1);
-  let randomCountries = [];
+  resetCountdown();
+  questionNo();
 
-  // Get 4 random country names (1 correct, 3 wrong)
-  for(let i = 0; i < 3; i++) {
-    randomCountries.push(Math.trunc(Math.random() * data.length - 1));
+  // Call countdown timer
+  let countries = [];
+
+  // Get 3 wrong random countries
+  while(countries.length < 3) {
+    const randomCountry = Math.trunc(Math.random() * data.length);
+    
+    // Do not push if the random country already exists
+    if(!countries.includes(randomCountry)) {
+      countries.push(randomCountry);
+    }
   }
 
-  randomCountries.push(correctCountry);
+  // Prevent correct country to generate same country from the 3 wrong countries
+  do {
+    correctCountry = Math.trunc(Math.random() * data.length);
+  } while(countries.includes(correctCountry))
+
+  // Push the final correct country to the wrong countries
+  countries.push(correctCountry);
 
   // Get the country names
   console.log(data[correctCountry].name);
   console.log(data[correctCountry].name.common);
-  console.log(randomCountries);
+  console.log(countries);
 
-  const shuffledArray = shuffleArray(randomCountries);
+  const shuffledArray = shuffleArray(countries);
 
   answerButton(shuffledArray, correctCountry);
 
   // Clear wrong/correct style from the buttons
   btns.forEach(btn => {
     btn.classList.remove('wrong', 'correct');
-  })
+  });
 
   renderCountry(data[correctCountry]);
-  EnableBtns();
+  enableBtns();
+  // Increment Question No.
+  questionCounter++;
 }
 
 const answerButton = function(arr) {
@@ -229,7 +117,7 @@ const disableBtns = function() {
 
 
 // Enable all buttons
-const EnableBtns = function() {
+const enableBtns = function() {
   btns.forEach(btn => {
     btn.disabled = false;
     btn.classList.remove('disabled');
@@ -243,6 +131,8 @@ btnContainer.addEventListener('click', function(e) {
 
   if(target.classList.contains('btn-country')) {
 
+    // Indicator that answer is selected
+    answerSelected = true;
     disableBtns();
 
     if(target.textContent === data[correctCountry].name.official) {
@@ -251,6 +141,7 @@ btnContainer.addEventListener('click', function(e) {
       target.classList.add('correct');
       target.innerHTML = 'You are correct!';
       showArkyn();
+      score();
       
       function randomInRange(min, max) {
         return Math.random() * (max - min) + min;
@@ -279,12 +170,87 @@ btnContainer.addEventListener('click', function(e) {
           }, 150)
 
         }
-      })
+      });
     }
+
+    gameOver();
   }
   
 });
 
-btnNext.addEventListener('click', nextQuestion);
 
+const questionNo = function() {
+  questionEl.innerHTML = `Question No.${questionCounter}`;
+}
+
+const resetCountdown = function() {
+  clearInterval(countdownIntervalID);
+  countdownSec = 10;
+  countdownEl.innerHTML = countdownSec;
+  countdownIntervalID = setInterval(countdown, 1000);
+}
+
+const score = function() {
+  scoreNo++;
+  scoreEl.innerHTML = `Score: ${scoreNo}/${ScoreItems}`;
+}
+
+const countdown = function() {
+
+  if(countdownSec > 0) {
+    countdownSec--;
+    countdownEl.innerHTML = countdownSec;
+  } else {
+    clearInterval(countdownIntervalID);
+    nextQuestion();
+
+    if(!newGame) {
+      gameOver();
+    }
+  }
+
+}
+
+btnNext.addEventListener('click', () => {
+  if(newGame) {
+    console.log('New game');
+    resetGame();
+    newGame = false;
+  } else if(answerSelected) {
+    nextQuestion();
+    answerSelected = false;
+  }
+});
+
+const gameOver = function() {
+  if(questionCounter >= 4) {
+    console.log('GAME OVER!');
+    clearInterval(countdownIntervalID);
+    countriesContainer.classList.add('hide');
+    countdownEl.classList.add('hide');
+    scorecardEl.classList.remove('hide');
+    btnNext.textContent = 'TRY AGAIN?';
+    finalScoreEl.innerHTML = `Final Score: ${scoreNo}/${ScoreItems}`;
+    disableBtns();
+    newGame = true;
+  }
+}
+
+const resetGame = function() {
+  questionCounter = 1;
+  scoreNo = 0;
+  answerSelected = false;
+
+  countriesContainer.classList.remove('hide');
+  countdownEl.classList.remove('hide');
+  scorecardEl.classList.add('hide');
+  finalScoreEl.innerHTML = `Final Score: ${scoreNo}/${ScoreItems}`;
+  scoreEl.innerHTML = `Score: ${scoreNo}/${ScoreItems}`;
+  btnNext.textContent = 'NEXT';
+  resetCountdown();
+  whereAmI();
+}
+
+questionNo();
+resetCountdown();
 whereAmI();

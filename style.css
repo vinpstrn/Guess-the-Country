@@ -28,8 +28,27 @@ body {
   text-align: center;
 }
 
+.header {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  font-size: 1.4rem;
+}
+
 .heading {
   font-size: 1.5rem;
+  grid-column: 1 / -1;
+}
+
+.questions {
+
+}
+
+.score {
+
+}
+
+.countdown {
+  grid-column: 1 / -1;
 }
 
 .country {
@@ -68,7 +87,7 @@ body {
 }
 
 .btn-country:hover {
-  background-color: green;
+  background-color: rgb(88, 165, 88);
   color: #fff;
 }
 
@@ -111,6 +130,28 @@ body {
 
 .arkyn-img-correct {
   animation: move2 .5s infinite alternate;
+}
+
+.countdown {
+  font-size: 6rem;
+  font-weight: bold;
+  color: green;
+}
+
+.scorecard p {
+  font-size: 4rem;
+  font-weight: bold;
+}
+.scorecard p:not(:first-child) {
+  color: green;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
 }
 
 @keyframes move {
